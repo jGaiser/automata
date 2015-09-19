@@ -1,7 +1,11 @@
 var automata = (function(){
   var canvas = document.getElementById('viewport'),
-      ctx = canvas.getContext('2d');
-      
+      ctx = canvas.getContext('2d'),
+      cellSize = 50,     
+      cellArray = [],
+      i,
+      n;
+
   function Cell(x, y, w){
     this.x = x;
     this.y = y; 
@@ -10,13 +14,32 @@ var automata = (function(){
 
     this.draw = function(){
       ctx.save();
-      
+      ctx.lineWidth = 1; 
       ctx.strokeStyle = this.color;
       ctx.beginPath();
       ctx.rect(this.x, this.y, w, w);
       ctx.stroke();
       ctx.restore();    
     }
+
+    cellArray.push(this);
+  }
+
+  function buildGrid(){
+    var cellWidth = canvas.getAttribute('width') / cellSize, 
+        gridWidth = canvas.getAttribute('width') / cellWidth,
+        gridHeight = canvas.getAttribute('height') / cellWidth; 
+    
+    for(i = 0; i <= gridWidth; i++){
+      for(n = 0; n <= gridHeight; n++){ 
+        new Cell(cellWidth * i, cellWidth * n, cellWidth);
+      }
+    }
+
+    for(i = 0; i < cellArray.length; i++){
+      cellArray[i].draw(); 
+    } 
+    console.log(cellArray);
   }
   
   function resizeCanvas(){
@@ -25,16 +48,12 @@ var automata = (function(){
   }
  
   function testIt(){
-    var newCell = new Cell(50, 50, 50);
-    newCell.draw();  
-    console.log(newCell);
+    buildGrid();
   } 
     
   function init(){
     resizeCanvas();  
     testIt();
-    var newCell = new Cell();
-    newCell.draw();  
   }
 
   init();
