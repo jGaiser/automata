@@ -10,6 +10,8 @@ var automata = (function(){
       cellWidth,
       gridWidth,
       gridHeight,
+      curCell,
+      curNeighborCells,
       //iterators
       i,
       n;
@@ -18,6 +20,8 @@ var automata = (function(){
     this.x = x;
     this.y = y; 
     this.w = w;
+    this.coordinates = {};
+    this.neighborCells = {};
     this.power = 0.0;
     this.color = 'rgb(30,30,30)';
     this.fillColor = 'rgba(50, 100, 150, ' + this.power + ')'; 
@@ -33,6 +37,11 @@ var automata = (function(){
 
       if(this.power > 0){
         ctx.fillRect(this.x, this.y, w, w);
+
+        if(activeCells.indexOf(this) == -1){
+          activeCells.push(this);
+          console.log(this.neighborCells.l.power);
+        }
       }
     
       ctx.restore();    
@@ -40,14 +49,10 @@ var automata = (function(){
 
     this.hoverHandler = function(){
       this.power = 1;  
-      this.fillColor = 'rgba(50, 100, 150, ' + this.power + ')'; 
-      
-      if(activeCells.indexOf(this) == -1){
-        activeCells.push(this);
-      }
+      this.fillColor = 'rgba(50, 100, 150, ' + this.power + ')';  
     }
 
-    this.step = function(){
+    this.step = function(){  
       this.power -= 0.10;   
       this.fillColor = 'rgba(50, 100, 150, ' + this.power + ')'; 
 
@@ -60,18 +65,35 @@ var automata = (function(){
   }
 
   function buildGrid(){
+    var newCell;
+    var tempArray = [];
     cellWidth = cellWidth   || canvas.getAttribute('width') / cellSize; 
     gridWidth = gridWidth   || canvas.getAttribute('width') / cellWidth;
     gridHeight = gridHeight || canvas.getAttribute('height') / cellWidth; 
     
     for(i = 0; i <= gridWidth; i++){
+      tempArray.push([]);
       for(n = 0; n <= gridHeight; n++){ 
-        new Cell(cellWidth * i, cellWidth * n, cellWidth);
+        tempArray[i].push([]);
+
+        newCell = new Cell(cellWidth * i, cellWidth * n, cellWidth);
+        newCell.coords = {col: i, row: n};
+        tempArray[i][n] = newCell;
+
+        if(i > 0){
+          tempArray[i - 1][n].neighborCells.r = newCell;  
+          newCell.neighborCells.l = tempArray[i - 1][n];
+        }
+
+        if(n > 0){
+          tempArray[i][n - 1].neighborCells.b = newCell;
+          newCell.neighborCells.t = tempArray[i][n - 1];  
+        }
       }
     }
 
     for(i = 0; i < cellArray.length; i++){
-      cellArray[i].draw(); 
+       
     } 
   }
   
@@ -98,14 +120,15 @@ var automata = (function(){
   function step(){
     ctx.clearRect(0,0, canvasWidth, canvasHeight);  
     for(i = 0; i < cellArray.length; i++){
-      cellArray[i].draw(); 
+      currCell = cellArray[i];
+      
+      currCell.draw(); 
     }
     
     for(n=0; n < activeCells.length; n++){
       activeCells[n].step();
     }
     
-    console.log(activeCells);
     requestAnimationFrame(step);
   }
 
