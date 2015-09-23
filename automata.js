@@ -22,14 +22,13 @@ var automata = (function(){
     this.w = w;
     this.coordinates = {};
     this.neighborCells = {};
+    this.candidatePower = [];
     this.power = 0.0;
     this.color = 'rgb(30,30,30)';
     this.fillColor = 'rgba(50, 100, 150, ' + this.power + ')'; 
 
     this.draw = function(){
       ctx.save();
-      ctx.lineWidth = 1; 
-      ctx.strokeStyle = this.color;
       ctx.fillStyle = this.fillColor;
       ctx.beginPath();
       ctx.rect(this.x, this.y, w, w);
@@ -37,10 +36,6 @@ var automata = (function(){
 
       if(this.power > 0){
         ctx.fillRect(this.x, this.y, w, w);
-
-        if(activeCells.indexOf(this) == -1){
-          activeCells.push(this);
-        }
       }
     
       ctx.restore();    
@@ -122,7 +117,7 @@ var automata = (function(){
   function step(){
     ctx.clearRect(0,0, canvasWidth, canvasHeight);  
    
-    for(n=0; n < activeCells.length; n++){
+    for(n = activeCells.length - 1; n >= 0; n--){
       activeCells[n].step();
     }
     
