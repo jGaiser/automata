@@ -40,7 +40,6 @@ var automata = (function(){
 
         if(activeCells.indexOf(this) == -1){
           activeCells.push(this);
-          console.log(this.neighborCells.l.power);
         }
       }
     
@@ -50,6 +49,7 @@ var automata = (function(){
     this.hoverHandler = function(){
       this.power = 1;  
       this.fillColor = 'rgba(50, 100, 150, ' + this.power + ')';  
+      activeCells.push(this);
     }
 
     this.step = function(){  
@@ -58,6 +58,8 @@ var automata = (function(){
 
       if(this.power < 0){
         activeCells.splice(activeCells.indexOf(this), 1);   
+      }else{
+        this.draw();
       }
     }
 
@@ -119,12 +121,7 @@ var automata = (function(){
   
   function step(){
     ctx.clearRect(0,0, canvasWidth, canvasHeight);  
-    for(i = 0; i < cellArray.length; i++){
-      currCell = cellArray[i];
-      
-      currCell.draw(); 
-    }
-    
+   
     for(n=0; n < activeCells.length; n++){
       activeCells[n].step();
     }
